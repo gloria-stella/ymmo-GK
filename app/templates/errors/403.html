@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Accès interdit{% endblock %}
+{% block content %}
+<section class="error-page">
+  <h1>403 - Accès interdit</h1>
+  <p>Vous n'avez pas les droits nécessaires pour accéder à cette page.</p>
+  <a class="btn btn-primary" href="{{ url_for('properties.index') }}">Retour à l'accueil</a>
+</section>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ bien.title }}{% endblock %}
+
+{% block content %}
+<article class="property-detail" aria-labelledby="titre-bien">
+  <a href="{{ url_for('properties.index') }}" class="back-link">&larr; Retour aux biens</a>
+
+  <h1 id="titre-bien">{{ bien.title }}</h1>
+  <p class="property-city">{{ bien.city }} ({{ bien.postal_code }})</p>
+
+  <p class="property-price-lg">{{ '{:,.0f}'.format(bien.price).replace(',', ' ') }} €
+    <span class="price-m2">soit {{ '{:,.0f}'.format(bien.price_per_m2).replace(',', ' ') }} €/m²</span>
+  </p>
+
+  <dl class="detail-list">
+    <div><dt>Type</dt><dd>{{ bien.property_type.value|replace('_', ' ')|capitalize }}</dd></div>
+    <div><dt>Surface</dt><dd>{{ bien.surface }} m²</dd></div>
+    <div><dt>Pièces</dt><dd>{{ bien.rooms }}</dd></div>
+    <div><dt>Statut</dt><dd>{{ bien.status.value|replace('_', ' ')|capitalize }}</dd></div>
+    <div><dt>Agent</dt><dd>{{ bien.agent.full_name if bien.agent else 'Agence Ymmo' }}</dd></div>
+  </dl>
+
+  {% if bien.description %}
+    <section aria-labelledby="titre-desc">
+      <h2 id="titre-desc">Description</h2>
+      <p>{{ bien.description }}</p>
+    </section>
+  {% endif %}
+
+  {# L'offre est visible UNIQUEMENT si l'utilisateur est connecté ET qu'il est un client #}
+  {% if current_user.is_authenticated and current_user.role.name.lower() == 'client' and bien.is_available %}
+    <section aria-labelledby="titre-offre" class="offer-box">
+      <h2 id="titre-offre">Faire une offre d'achat</h2>
+      <form method="post" action="{{ url_for('properties.make_offer', property_id=bien.id) }}">
+        <div class="field">
+          <label for="offer_price">Montant de votre offre (€)</label>
+          <input type="number" id="offer_price" name="offer_price" min="1" step="1000"
+                 value="{{ bien.price }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Envoyer mon offre</button>
+      </form>
+    </section>
+  {% endif %}
+
+  {# Les boutons d'action sont visibles pour les AGENTS et les ADMINS connectés #}
+  {% if current_user.is_authenticated and (current_user.role.name.lower() == 'agent' or current_user.role.name.lower() == 'admin') %}
+    <div class="agent-actions">
+      <a class="btn btn-outline" href="{{ url_for('properties.edit', property_id=bien.id) }}">Modifier</a>
+      <form method="post" action="{{ url_for('properties.delete', property_id=bien.id) }}"
+            onsubmit="return confirm('Supprimer définitivement ce bien ?');">
+        <button type="submit" class="btn btn-danger">Supprimer</button>
+      </form>
+    </div>
+  {% endif %}
+</article>
+{% endblock %}

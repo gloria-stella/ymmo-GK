@@ -1,0 +1,9 @@
+# Environnement Python
+venv/
+__pycache__/
+*.pyc
+# Variables d'environnement (ne jamais committer les vrais identifiants)
+.env
+# Fichiers IDE
+.vscode/
+.idea/

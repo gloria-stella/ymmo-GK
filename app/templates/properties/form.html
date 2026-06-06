@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Modifier' if bien else 'Publier' }} un bien{% endblock %}
+
+{% block content %}
+<section aria-labelledby="titre-form">
+  <h1 id="titre-form">{{ 'Modifier le bien' if bien else 'Publier un nouveau bien' }}</h1>
+
+  <form method="post" class="property-form">
+    <div class="field">
+      <label for="title">Titre <span aria-hidden="true">*</span></label>
+      <input type="text" id="title" name="title" required
+             value="{{ bien.title if bien else '' }}">
+    </div>
+
+    <div class="field">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="4">{{ bien.description if bien else '' }}</textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="field">
+        <label for="property_type">Type <span aria-hidden="true">*</span></label>
+        <select id="property_type" name="property_type" required>
+          {% for t in types %}
+            <option value="{{ t.value }}"
+              {% if bien and bien.property_type == t %}selected{% endif %}>
+              {{ t.value|replace('_', ' ')|capitalize }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {% if bien %}
+      <div class="field">
+        <label for="status">Statut</label>
+        <select id="status" name="status">
+          {% for s in statuses %}
+            <option value="{{ s.value }}" {% if bien.status == s %}selected{% endif %}>
+              {{ s.value|replace('_', ' ')|capitalize }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="form-row">
+      <div class="field">
+        <label for="price">Prix (€) <span aria-hidden="true">*</span></label>
+        <input type="number" id="price" name="price" min="0" step="1000" required
+               value="{{ bien.price if bien else '' }}">
+      </div>
+      <div class="field">
+        <label for="surface">Surface (m²) <span aria-hidden="true">*</span></label>
+        <input type="number" id="surface" name="surface" min="1" required
+               value="{{ bien.surface if bien else '' }}">
+      </div>
+      <div class="field">
+        <label for="rooms">Pièces</label>
+        <input type="number" id="rooms" name="rooms" min="0"
+               value="{{ bien.rooms if bien else 1 }}">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="field">
+        <label for="city">Ville <span aria-hidden="true">*</span></label>
+        <input type="text" id="city" name="city" required
+               value="{{ bien.city if bien else '' }}">
+      </div>
+      <div class="field">
+        <label for="postal_code">Code postal <span aria-hidden="true">*</span></label>
+        <input type="text" id="postal_code" name="postal_code" required
+               value="{{ bien.postal_code if bien else '' }}">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      {{ 'Enregistrer les modifications' if bien else 'Publier le bien' }}
+    </button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord d'analyse{% endblock %}
+
+{% block content %}
+<section aria-labelledby="titre-analyse">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div>
+      <h1 id="titre-analyse" style="margin-bottom: 5px;">Analyse du marché immobilier</h1>
+      <p class="subtitle" style="margin: 0;">Indicateurs calculés à partir des données de la plateforme (Python / pandas).</p>
+    </div>
+    <a href="{{ url_for('analytics.export_pdf') }}" class="btn btn-primary" style="background-color: #22c55e; border-color: #22c55e; text-decoration: none; padding: 10px 15px; border-radius: 4px; color: white; font-weight: bold;">
+      Exporter en PDF
+    </a>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-value">{{ summary.total_biens }}</span>
+      <span class="stat-label">Biens enregistrés</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ '{:,.0f}'.format(summary.prix_moyen).replace(',', ' ') }} €</span>
+      <span class="stat-label">Prix moyen</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ '{:,.0f}'.format(summary.prix_m2_moyen).replace(',', ' ') }} €</span>
+      <span class="stat-label">Prix moyen au m²</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ '{:,.0f}'.format(summary.surface_moyenne).replace(',', ' ') }} m²</span>
+      <span class="stat-label">Surface moyenne</span>
+    </div>
+  </div>
+
+  <div class="analytics-columns">
+    <section aria-labelledby="titre-ville">
+      <h2 id="titre-ville">Statistiques par ville</h2>
+      <table class="data-table">
+        <caption class="sr-only">Nombre de biens, prix moyen et prix au m² par ville</caption>
+        <thead>
+          <tr><th scope="col">Ville</th><th scope="col">Biens</th>
+              <th scope="col">Prix moyen</th><th scope="col">Prix/m²</th></tr>
+        </thead>
+        <tbody>
+          {% for row in by_city %}
+            <tr>
+              <th scope="row">{{ row.city }}</th>
+              <td>{{ row.nb_biens }}</td>
+              <td>{{ '{:,.0f}'.format(row.prix_moyen).replace(',', ' ') }} €</td>
+              <td>{{ '{:,.0f}'.format(row.prix_m2_moyen).replace(',', ' ') }} €</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="4">Aucune donnée disponible.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="titre-zones">
+      <h2 id="titre-zones">Zones intéressantes à l'achat</h2>
+      <p class="subtitle">Villes au prix/m² le plus bas (prévision d'opportunité).</p>
+      <ol class="ranking">
+        {% for row in best_cities %}
+          <li>
+            <strong>{{ row.city }}</strong> —
+            {{ '{:,.0f}'.format(row.prix_m2_moyen).replace(',', ' ') }} €/m²
+            ({{ row.nb_biens }} biens)
+          </li>
+        {% else %}
+          <li>Pas assez de données pour une recommandation fiable.</li>
+        {% endfor %}
+      </ol>
+
+      <h2 id="titre-types">Types de biens populaires</h2>
+      <ul class="bar-list">
+        {% for row in popular_types %}
+          <li>
+            <span class="bar-label">{{ row.property_type|replace('_', ' ')|capitalize }}</span>
+            <span class="bar-count">{{ row.nb_biens }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</section>
+{% endblock %}

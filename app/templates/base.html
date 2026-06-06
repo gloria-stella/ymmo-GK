@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ymmo - plateforme de gestion d'achat et de vente de biens immobiliers.">
+  <title>{% block title %}Ymmo{% endblock %} | Ymmo</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* Styles rapides pour l'accessibilité et le mode sombre */
+    :root {
+      --bg-principal: #ffffff;
+      --texte-principal: #333333;
+      --bg-header: #1e293b;
+      --texte-header: #ffffff;
+      --bg-carte: #f8fafc;
+      --bordure: #e2e8f0;
+    }
+    
+    body.dark-theme {
+      --bg-principal: #0f172a;
+      --texte-principal: #f8fafc;
+      --bg-carte: #1e293b;
+      --bordure: #334155;
+    }
+
+    body {
+      background-color: var(--bg-principal) !important;
+      color: var(--texte-principal) !important;
+      transition: background-color 0.3s, font-size 0.2s;
+    }
+
+    .site-header { background-color: var(--bg-header); color: var(--texte-header); }
+    .stat-card, .auth-box, .property-detail, .offer-box, .data-table th, .data-table td { 
+      background-color: var(--bg-carte) !important; 
+      color: var(--texte-principal) !important;
+      border-color: var(--bordure) !important;
+    }
+
+    .a11y-controls {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      margin-left: 15px;
+    }
+    .btn-a11y {
+      background: #334155;
+      color: white;
+      border: none;
+      padding: 3px 8px;
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .btn-a11y:hover { background: #475569; }
+    .password-wrapper { position: relative; display: flex; align-items: center; }
+    .password-toggle {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#contenu">Aller au contenu principal</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="{{ url_for('properties.index') }}" class="logo" aria-label="Accueil Ymmo">Ymmo</a>
+      <nav aria-label="Navigation principale">
+        <ul class="nav-list" style="display: flex; align-items: center;">
+          <li><a href="{{ url_for('properties.index') }}">Biens</a></li>
+          {% if current_user.is_authenticated %}
+            {% if current_user.is_agent() %}
+              <li><a href="{{ url_for('properties.create') }}">Publier un bien</a></li>
+              <li><a href="{{ url_for('analytics.dashboard') }}">Analyses</a></li>
+            {% endif %}
+            <li><span class="nav-user">{{ current_user.first_name }}</span></li>
+            <li><a href="{{ url_for('auth.logout') }}">Déconnexion</a></li>
+          {% else %}
+            <li><a href="{{ url_for('auth.login') }}">Connexion</a></li>
+            <li><a class="btn btn-primary btn-sm" href="{{ url_for('auth.register') }}">Inscription</a></li>
+          {% endif %}
+          
+          <li class="a11y-controls">
+            <button class="btn-a11y" id="toggle-theme" title="Changer de thème">🌓</button>
+            <button class="btn-a11y" id="text-inv" title="Diminuer le texte">A-</button>
+            <button class="btn-a11y" id="text-inc" title="Agrandir le texte">A+</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenu" class="container main-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-zone" role="status" aria-live="polite">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Ymmo - Groupe immobilier. Projet pédagogique Ynov.</p>
+    </div>
+  </footer >
+
+  <script>
+    // Gestion du mode sombre
+    const toggleThemeBtn = document.getElementById('toggle-theme');
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-theme');
+    }
+    toggleThemeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-theme');
+      localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+    });
+
+    // Gestion de la taille du texte
+    let currentFontSize = parseInt(localStorage.getItem('font-scale')) || 100;
+    document.body.style.fontSize = currentFontSize + '%';
+
+    document.getElementById('text-inc').addEventListener('click', () => {
+      if(currentFontSize < 140) {
+        currentFontSize += 10;
+        document.body.style.fontSize = currentFontSize + '%';
+        localStorage.setItem('font-scale', currentFontSize);
+      }
+    });
+
+    document.getElementById('text-inv').addEventListener('click', () => {
+      if(currentFontSize > 80) {
+        currentFontSize -= 10;
+        document.body.style.fontSize = currentFontSize + '%';
+        localStorage.setItem('font-scale', currentFontSize);
+      }
+    });
+  </script>
+</body>
+</html>

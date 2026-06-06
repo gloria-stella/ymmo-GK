@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Gestion du Personnel{% endblock %}
+
+{% block content %}
+<section class="admin-box">
+  <h1>Back-Office : Gestion des rôles Ymmo</h1>
+  <a href="{{ url_for('properties.index') }}" class="back-link">&larr; Retour à l'accueil</a>
+  
+  <table class="table" style="width:100%; margin-top:20px; border-collapse: collapse;">
+    <thead>
+      <tr style="background:#f4f4f4; text-align:left;">
+        <th style="padding:10px;">Nom / Prénom</th>
+        <th style="padding:10px;">Email</th>
+        <th style="padding:10px;">Rôle Actuel</th>
+        <th style="padding:10px;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+        {% if u.email != 'admin@ymmo.fr' %} {# On ne modifie pas le super-admin #}
+        <tr style="border-bottom: 1px solid #ddd;">
+          <td style="padding:10px;">{{ u.first_name }} {{ u.last_name }}</td>
+          <td style="padding:10px;">{{ u.email }}</td>
+          <td style="padding:10px;"><strong>{{ u.role.name }}</strong></td>
+          <td style="padding:10px;">
+            <form method="post" style="display:inline;">
+              <input type="hidden" name="user_id" value="{{ u.id }}">
+              {% if u.role.name.lower() == 'client' %}
+                <button type="submit" name="role" value="agent" class="btn" style="background:#28a745; color:white; padding:5px 10px; font-size:12px;">Passer Agent</button>
+              {% else %}
+                <button type="submit" name="role" value="client" class="btn" style="background:#dc3545; color:white; padding:5px 10px; font-size:12px;">Rétrograder Client</button>
+              {% endif %}
+            </form>
+          </td>
+        </tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

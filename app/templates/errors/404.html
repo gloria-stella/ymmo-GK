@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Page introuvable{% endblock %}
+{% block content %}
+<section class="error-page">
+  <h1>404 - Page introuvable</h1>
+  <p>La page que vous recherchez n'existe pas ou a été déplacée.</p>
+  <a class="btn btn-primary" href="{{ url_for('properties.index') }}">Retour à l'accueil</a>
+</section>
+{% endblock %}

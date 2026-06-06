@@ -1,0 +1,1 @@
+"""Blueprints (routes) de l'application Ymmo."""
